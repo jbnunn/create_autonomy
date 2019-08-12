@@ -1,13 +1,17 @@
 # create_autonomy
 
 [ROS](http://ros.org) driver for iRobot [Create 2](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx).
-This package is based off of [https://github.com/AutonomyLab/create_autonomy](https://github.com/AutonomyLab/create_autonomy), but specifically for ROS Melodic and the Create 2. It wraps the C++ library [libcreate][libcreate], which uses iRobot's [Open Interface Specification][oi_spec]. Build switches have been applied to facilitate installation on a Raspberry Pi.
+This package is based off of [https://github.com/AutonomyLab/create_autonomy](https://github.com/AutonomyLab/create_autonomy), but specifically for ROS Melodic and the Create 2. It wraps the C++ library [libcreate][libcreate], which uses iRobot's [Open Interface Specification][oi_spec]. 
 
 <!--[](* Documentation: TODO)-->
 * ROS wiki page: http://wiki.ros.org/create_autonomy
 * Support: [ROS Answers (tag: create_autonomy)](http://answers.ros.org/questions/scope:all/sort:activity-desc/tags:create_autonomy/page:1/)
 * Original Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
 * Melodic/Create 2 Maintainer: [Jeff Nunn](https://twitter.com/jbnunn)
+
+## Raspberry Pi
+
+This is tested and working on a Raspberry Pi 2 Model B v 1.1, and will likely work on models newer than that. Build switches have been applied to facilitate installation on a Raspberry Pi.
 
 ## Supported Robots
 
@@ -153,11 +157,11 @@ $ roslaunch ca_driver create_2.launch config:=/abs/path/to/config.yaml desc:=fal
  `battery/temperature` | The temperature of the robot's battery (degrees Celsius) | [std_msgs/Int16][int16]
  `battery/voltage` | Voltage of the robot's battery (V) | [std_msgs/Float32][float32]
  `bumper` | Bumper state message (including light sensors on bumpers) | [ca_msgs/Bumper][bumper_msg]
- `clean_button` | 'clean' button is pressed ('play' button for Create 1) | [std_msgs/Empty][empty]
+ `clean_button` | 'clean' button is pressed | [std_msgs/Empty][empty]
  `day_button` |  'day' button is pressed | [std_msgs/Empty][empty]
  `hour_button` | 'hour' button is pressed | [std_msgs/Empty][empty]
  `minute_button` | 'minute' button is pressed | [std_msgs/Empty][empty]
- `dock_button` | 'dock' button is pressed ('advance' button for Create 1) | [std_msgs/Empty][empty]
+ `dock_button` | 'dock' button is pressed | [std_msgs/Empty][empty]
  `spot_button` | 'spot' button is pressed | [std_msgs/Empty][empty]
  `ir_omni` | The IR character currently being read by the omnidirectional receiver. Value 0 means no character is being received | [std_msgs/UInt16][uint16]
  `joint_states` | The states (position, velocity) of the drive wheel joints | [sensor_msgs/JointState][jointstate_msg]
@@ -185,7 +189,19 @@ Topic       | Description   | Type
 
 ## Commanding your Create
 
+You can print output of a publisher topic by sending an echo command to the topic, e.g.:
+
+``` bash
+$ rostopic echo /battery/charge
+```
+
 You can move the robot around by sending [geometry_msgs/Twist][twist] messages to the topic `cmd_vel`:
+
+``` bash
+$ rostopic pub /cmd_vel geometry_msgs/Twist -- '[0.5, 0.0, 0.0]' '[0.0, 0.0, 0.0]'
+```
+
+The `geometry_msgs/Twist` values follow:
 
 ```
 linear.x  (+)     Move forward (m/s)
