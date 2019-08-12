@@ -1,34 +1,19 @@
 # create_autonomy
 
-[ROS](http://ros.org) driver for iRobot [Create 1 and 2](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx).
-This package wraps the C++ library [libcreate][libcreate], which uses iRobot's [Open Interface Specification][oi_spec].
+[ROS](http://ros.org) driver for iRobot [Create 2](http://www.irobot.com/About-iRobot/STEM/Create-2.aspx).
+This package is based off of [https://github.com/AutonomyLab/create_autonomy](https://github.com/AutonomyLab/create_autonomy), but specifically for ROS Melodic and the Create 2. It wraps the C++ library [libcreate][libcreate], which uses iRobot's [Open Interface Specification][oi_spec]. Build switches have been applied to facilitate installation on a Raspberry Pi.
 
 <!--[](* Documentation: TODO)-->
 * ROS wiki page: http://wiki.ros.org/create_autonomy
 * Support: [ROS Answers (tag: create_autonomy)](http://answers.ros.org/questions/scope:all/sort:activity-desc/tags:create_autonomy/page:1/)
-* Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
-
-## Build Status
-
-TravisCI (Ubuntu _Trusty_, ROS _Indigo_ and _Jade_)  
-![Build Status](https://api.travis-ci.org/AutonomyLab/create_autonomy.svg?branch=indigo-devel)
+* Original Author: [Jacob Perron](http://jacobperron.ca) ([Autonomy Lab](http://autonomylab.org), [Simon Fraser University](http://www.sfu.ca))
+* Melodic/Create 2 Maintainer: [Jeff Nunn](https://twitter.com/jbnunn)
 
 ## Supported Robots
 
 | Model     | Support    |
 |-----------|------------|
-| Create 1  |  Yes       |
 | Create 2  _(firmware >= 3.2.6)_ |  Yes       |
-| Roomba Original Series | No  |
-| Roomba 400 Series |  Yes  |
-| Roomba 500 Series |  Yes *  |
-| Roomba 600 Series |  Yes * |
-| Roomba 700 Series |  Yes +  |
-| Roomba 800 Series |  Yes + |
-| Roomba 900 Series |  No *  |
-
-_+ Verified by third-party. Please note [Odometry Issue #28](https://github.com/AutonomyLab/create_autonomy/issues/32)_  
-_* Not verified. Anyone who is able to verify that this driver works or not is encouraged to contact [Jacob](https://jacobperron.ca) with their findings or open an issue._
 
 ## Features
 
@@ -63,7 +48,7 @@ _* Not verified. Anyone who is able to verify that this driver works or not is e
 #### Prerequisites
 
 * Internet connection
-* [ROS](http://wiki.ros.org/ROS/Installation) _Indigo_ or _Jade_
+* [ROS](http://wiki.ros.org/ROS/Installation) _Melodic_
 * Ubuntu packages: `python-rosdep`, `python-catkin-tools`
 
 ``` bash
@@ -83,58 +68,53 @@ $ sudo apt-get install python-rosdep python-catkin-tools
 2. Clone this repo  
     ``` bash
     $ cd ~/create_ws/src
-    $ git clone https://github.com/AutonomyLab/create_autonomy.git  
+    $ git clone https://github.com/jbnunn/create_autonomy.git  
     ```
   
 3. Install dependencies  
     ``` bash
+    $ sudo apt-get update && sudo apt-get install --only-upgrade python-catkin-pkg
+    $ cd ~/create_ws/src
+    $ git clone https://github.com/AutonomyLab/libcreate
+    $ git clone https://github.com/ros/diagnostics.git
     $ cd ~/create_ws
     $ rosdep update  
-    $ rosdep install --from-paths src -i  
+    $ rosdep install --from-paths src --ignore-src -r -y
     ```
 
 4. Build  
     ``` bash
     $ cd ~/create_ws
-    $ catkin build
+    $ catkin build -j1
     ```
+
+5. Source the workspace
+    ``` bash
+    $ echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+    $ echo "source $HOME/create_ws/devel/setup.bash" >> ~/.bashrc
+    $ source ~/.bashrc
+    ```
+
 #### USB Permissions
-5. In order to connect to Create over USB, ensure your user is in the dialout group
+6. In order to connect to Create over USB, ensure your user is in the dialout group
     ``` bash
     $ sudo usermod -a -G dialout $USER
     ```
 
-6. Logout and login for permission to take effect
+7. Logout and login for permission to take effect
 
 ## Running the driver
 
 ### Setup
 
-1. After compiling from source, don't forget to source your workspace:  
-    ``` bash
-    $ source ~/create_ws/devel/setup.bash
-    ```
+1. Connect computer to Create's 7-pin serial port
 
-2. Connect computer to Create's 7-pin serial port
-  - If using Create 1, ensure that nothing is connected to Create's DB-25 port
-
-3. Launch one of the existing launch files or adapt them to create your own.
+2. Launch one of the existing launch files or adapt them to create your own.
 
 ### Launch files
 
-For Create 2 (Roomba 600/700 series):
 ``` bash
 $ roslaunch ca_driver create_2.launch
-```
-
-For Create 1 (Roomba 500 series):
-``` bash
-$ roslaunch ca_driver create_1.launch
-```
-
-For Roomba 400 series:
-``` bash
-$ roslaunch ca_driver roomba_400.launch
 ```
 
 #### Launch file arguments
@@ -226,20 +206,6 @@ $ roslaunch ca_tools joy_teleop.launch [joy_config:=xbox360]
 ```
 
 There exists configuration files for the [Xbox 360 wired controller](https://www.amazon.ca/Microsoft-Xbox-360-Wired-Controller/dp/B003ZSN600) and the [Logitech F710 controller](http://gaming.logitech.com/en-ca/product/f710-wireless-gamepad). You can adapt these files for your preferred joystick configuration.
-
-## Contributions
-
-Contributing to the development and maintenance of _create\_autonomy_ is encouraged. Feel free to open issues or create pull requests on [GitHub](https://github.com/AutonomyLab/create_autonomy).
-
-### Contributors
-
-* [Michael Browne](http://brownem.engineer/)
-    - Confirms driver works with Roomba 700 and 800 series.
-* [Clyde McQueen](https://github.com/clydemcqueen)
-    - Added support for sound ([#37](https://github.com/AutonomyLab/create_autonomy/pull/37)).
-* [Ben Wolsieffer](https://github.com/lopsided98) 
-    - Added JointState publisher for wheels ([#26](https://github.com/AutonomyLab/create_autonomy/pull/26)).
-    - Added Create 1 description ([#27](https://github.com/AutonomyLab/create_autonomy/pull/27)).
 
 [libcreate]:  https://github.com/AutonomyLab/libcreate
 [oi_spec]:  https://www.adafruit.com/datasheets/create_2_Open_Interface_Spec.pdf
