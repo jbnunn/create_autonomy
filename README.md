@@ -121,6 +121,12 @@ $ sudo apt-get install python-rosdep python-catkin-tools
 $ roslaunch ca_driver create_2.launch
 ```
 
+Upon launching, you should see the following
+
+``` bash
+$ [ INFO] ... [CREATE] Ready.
+```
+
 #### Launch file arguments
 
 * **config** - Absolute path to a configuration file (YAML). Default: `ca_driver/config/default.yaml`
@@ -131,6 +137,7 @@ For example, if you would like to disable the robot description and provide a cu
 ```bash
 $ roslaunch ca_driver create_2.launch config:=/abs/path/to/config.yaml desc:=false
 ```
+
 
 ### Parameters
 
@@ -211,9 +218,31 @@ angular.z (+)     Rotate counter-clockwise (rad/s)
 ```
 #### Velocity limits
 
-` -0.5 <= linear.x <= 0.5` and `-4.25 <= angular.z <= 4.25`
+`-0.5 <= linear.x <= 0.5` and `-4.25 <= angular.z <= 4.25`
 
 ### Teleoperation
+
+#### Keyboard
+
+You can use [https://github.com/ros-teleop/teleop_twist_keyboard](https://github.com/ros-teleop/teleop_twist_keyboard) to control the Create 2 via the keyboard:
+
+``` bash
+$ cd ~/create_ws/src
+$ git clone https://github.com/ros-teleop/teleop_twist_keyboard.git
+$ cd ~/create_ws
+$ catkin build teleop_twist_keyboard
+$ source ~/.bashrc
+```
+
+You can run the teleop keyboard with
+
+    $ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+
+or with custom values,
+
+    $ rosrun teleop_twist_keyboard teleop_twist_keyboard.py _speed:=0.5 _turn:=0.5
+
+#### Joystick
 
 `ca_tools` comes with a launch file for teleoperating Create with a joystick.
 
